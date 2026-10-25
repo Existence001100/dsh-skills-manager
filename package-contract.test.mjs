@@ -18,14 +18,14 @@ function resolveInsideRoot(entry) {
 }
 
 test("package declares an installable DSH bundle", async () => {
-  assert.equal(manifest.name, "@wisdoverse/dsh-skills-manager");
+  assert.equal(manifest.name, "@existence001100/dsh-skills-manager");
   assert.notEqual(manifest.private, true);
   assert.equal(manifest.publishConfig?.access, "public");
   assert.equal(manifest.publishConfig?.registry, "https://registry.npmjs.org/");
   assert.equal(manifest.type, "module");
   assert.equal(manifest.engines?.node, "^22.19.0 || >=24.0.0");
   assert.equal(manifest.packageManager, "pnpm@11.19.0");
-  assert.equal(manifest.repository?.url, "git+https://github.com/Wisdoverse/dsh-skills-manager-plugin.git");
+  assert.equal(manifest.repository?.url, "git+https://github.com/Existence001100/dsh-skills-manager.git");
   assert.ok(manifest.keywords.includes("dsh-plugin"));
   assert.equal(manifest.dsh?.bundle?.patch, "./cordis.patch.yml");
   assert.deepEqual(manifest.dsh?.client?.inject, [

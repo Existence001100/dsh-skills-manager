@@ -8,26 +8,26 @@
 
 <strong>English</strong> · <a href="./README.zh-CN.md">简体中文</a>
 
-[![npm version](https://img.shields.io/npm/v/@wisdoverse/dsh-skills-manager?logo=npm&amp;style=flat-square)](https://www.npmjs.com/package/@wisdoverse/dsh-skills-manager)
-[![CI](https://github.com/Wisdoverse/dsh-skills-manager-plugin/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/Wisdoverse/dsh-skills-manager-plugin/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@existence001100/dsh-skills-manager?logo=npm&amp;style=flat-square)](https://www.npmjs.com/package/@existence001100/dsh-skills-manager)
+[![CI](https://github.com/Existence001100/dsh-skills-manager/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/Existence001100/dsh-skills-manager/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-16a34a.svg?style=flat-square)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-ESM-339933.svg?logo=nodedotjs&amp;logoColor=white&amp;style=flat-square)](https://nodejs.org/)
-[![Last commit](https://img.shields.io/github/last-commit/Wisdoverse/dsh-skills-manager-plugin?style=flat-square)](https://github.com/Wisdoverse/dsh-skills-manager-plugin/commits/main)
-[![GitHub stars](https://img.shields.io/github/stars/Wisdoverse/dsh-skills-manager-plugin?style=flat-square)](https://github.com/Wisdoverse/dsh-skills-manager-plugin/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/Existence001100/dsh-skills-manager?style=flat-square)](https://github.com/Existence001100/dsh-skills-manager/commits/main)
+[![GitHub stars](https://img.shields.io/github/stars/Existence001100/dsh-skills-manager?style=flat-square)](https://github.com/Existence001100/dsh-skills-manager/stargazers)
 
 </div>
 
 **🚀 Quick install**
 
 ```sh
-dsh plugin --profile web add @wisdoverse/dsh-skills-manager
+dsh plugin --profile web add @existence001100/dsh-skills-manager
 ```
 
 Restart the Web profile after installation. See [requirements and installation options](#quick-start).
 
 > **Changed in 1.1.0:** a model-initiated `skill_manager install` or `skill_manager update` now needs one approval decision. To restore the 1.0.x behavior, run `skill_manager set-config config={"installGate":"off"}`. See [install consent gate](#install-consent-gate).
 
-[🚀 Installation](#quick-start) · [✨ Features](#highlights) · [⚙️ Configuration](#skill-configuration) · [🐛 Feedback](https://github.com/Wisdoverse/dsh-skills-manager-plugin/issues)
+[🚀 Installation](#quick-start) · [✨ Features](#highlights) · [⚙️ Configuration](#skill-configuration) · [🐛 Feedback](https://github.com/Existence001100/dsh-skills-manager/issues)
 
 ## Table of contents
 
@@ -70,6 +70,8 @@ The built-in DSH `skill` tool relies on the model to notice a short summary and 
 | 🔄 | GitHub lifecycle | Install, update, authoritative sync, uninstall, and commit-change reporting |
 | 🧭 | Workspace-aware scope | Project skills override user skills without leaking configuration between workspaces |
 | 🛠️ | Built-in management | Settings UI plus the `skill_manager` model tool |
+| 🛂 | Install consent gate | A model-initiated `install` or `update` asks once. It fails closed without an approval channel. |
+| 🧩 | Capability proposal | An opt-in catalog proposes missing skills. One card per turn. It never auto-installs. |
 | 🛡️ | Guardrails | Source allowlisting, argument-array Git execution, hook path validation, and no shell execution for hooks |
 
 ## How it works
@@ -79,9 +81,13 @@ flowchart LR
     U[User message] --> M[Pre-step matcher]
     M -->|auto| A[Inject full skill]
     M -->|suggest| S[Inject reminder]
+    M -->|gap| P2[Candidate catalog]
+    P2 -->|opt-in| PR[Inject proposal]
     T[Tool call] --> P[PreToolUse policy]
     R[Tool result] --> O[PostToolUse activation]
-    G[GitHub source] --> Y[Install or update]
+    I[Model calls install/update] --> G{Install gate}
+    G -->|allowed-once| Y[Git clone or fetch]
+    G -->|rejected / unavailable| D[Deny with degradation]
     Y --> C[DSH skill catalog]
     C --> M
 ```
@@ -94,6 +100,11 @@ Before each agent step, the plugin scores available skills:
 
 By default, a turn can auto-load up to two skills and suggest up to three. Activation markers are stored in conversation history, so full skill content is not injected repeatedly while it remains visible. After context compaction removes a marker, the skill can be loaded again automatically.
 
+Two separate constraints keep the model from acting on its own:
+
+- **Install consent gate.** Before a model-initiated `skill_manager install` or `skill_manager update` runs any Git command, the plugin asks the host approval seam for one decision. Only `allowed-once` proceeds. Rejection, cancellation, a missing channel, or a thrown request all deny. The model receives a degradation note and a structured code (see [Install consent gate](#install-consent-gate)).
+- **Capability proposal.** When an opt-in candidate catalog names sources that are not installed, the matcher may inject a proposal into the turn's first step. The proposal is model context, not a UI card, and it never installs anything on its own — the model must still call `install`, which the gate above will intercept. The branch is off by default and stays silent when the catalog is missing, the score is low, or every declared skill is already installed (see [Candidate catalog](#candidate-catalog)).
+
 ## Quick start
 
 ### Requirements
@@ -105,15 +116,15 @@ By default, a turn can auto-load up to two skills and suggest up to three. Activ
 ### Install from npm (recommended)
 
 ```sh
-dsh plugin --profile web add @wisdoverse/dsh-skills-manager
+dsh plugin --profile web add @existence001100/dsh-skills-manager
 ```
 
-DSH recognizes the package's `dsh.bundle` manifest and adds `@wisdoverse/dsh-skills-manager` to the Web profile automatically. Restart a running Web profile after installation.
+DSH recognizes the package's `dsh.bundle` manifest and adds `@existence001100/dsh-skills-manager` to the Web profile automatically. Restart a running Web profile after installation.
 
 ### Install from GitHub
 
 ```sh
-dsh plugin --profile web add github:Wisdoverse/dsh-skills-manager-plugin
+dsh plugin --profile web add github:Existence001100/dsh-skills-manager
 ```
 
 Use the GitHub source when testing unreleased changes from `main`. Pin a commit when reproducibility matters.
@@ -121,8 +132,8 @@ Use the GitHub source when testing unreleased changes from `main`. Pin a commit 
 ### Update or remove
 
 ```sh
-dsh plugin --profile web update @wisdoverse/dsh-skills-manager
-dsh plugin --profile web remove @wisdoverse/dsh-skills-manager
+dsh plugin --profile web update @existence001100/dsh-skills-manager
+dsh plugin --profile web remove @existence001100/dsh-skills-manager
 ```
 
 Restart the profile after either operation so its composition matches the installed bundle set.
@@ -130,8 +141,8 @@ Restart the profile after either operation so its composition matches the instal
 ### Install a local checkout for development
 
 ```sh
-git clone https://github.com/Wisdoverse/dsh-skills-manager-plugin.git
-cd dsh-skills-manager-plugin
+git clone https://github.com/Existence001100/dsh-skills-manager.git
+cd dsh-skills-manager
 pnpm install --frozen-lockfile
 dsh plugin --profile web add .
 ```
@@ -346,7 +357,7 @@ Project-local skills remain owned by the project's Git repository. The manager's
 
 ### Settings UI
 
-![Skill Management settings in the DSH Web profile](https://raw.githubusercontent.com/Wisdoverse/dsh-skills-manager-plugin/main/assets/skill-manager-settings.jpg)
+![Skill Management settings in the DSH Web profile](https://raw.githubusercontent.com/Existence001100/dsh-skills-manager/main/assets/skill-manager-settings.jpg)
 
 *The settings page shows activation controls, source details, and skill management actions.*
 
@@ -421,7 +432,7 @@ pnpm lint
 | `test.mjs` | Node test suite |
 | `cordis.patch.yml` | Host composition patch |
 
-Issues and pull requests are welcome in the [GitHub repository](https://github.com/Wisdoverse/dsh-skills-manager-plugin).
+Issues and pull requests are welcome in the [GitHub repository](https://github.com/Existence001100/dsh-skills-manager).
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup, validation, and pull-request expectations.
 
 ## License

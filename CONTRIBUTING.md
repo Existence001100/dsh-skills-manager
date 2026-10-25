@@ -12,8 +12,8 @@ Thanks for helping improve `dsh-skills-manager`.
 ## Setup
 
 ```sh
-git clone https://github.com/Wisdoverse/dsh-skills-manager-plugin.git
-cd dsh-skills-manager-plugin
+git clone https://github.com/Existence001100/dsh-skills-manager.git
+cd dsh-skills-manager
 pnpm install --frozen-lockfile
 ```
 

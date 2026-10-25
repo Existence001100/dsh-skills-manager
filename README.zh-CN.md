@@ -8,26 +8,26 @@
 
 <a href="./README.md">English</a> · <strong>简体中文</strong>
 
-[![npm 版本](https://img.shields.io/npm/v/@wisdoverse/dsh-skills-manager?logo=npm&amp;style=flat-square)](https://www.npmjs.com/package/@wisdoverse/dsh-skills-manager)
-[![CI](https://github.com/Wisdoverse/dsh-skills-manager-plugin/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/Wisdoverse/dsh-skills-manager-plugin/actions/workflows/ci.yml)
+[![npm 版本](https://img.shields.io/npm/v/@existence001100/dsh-skills-manager?logo=npm&amp;style=flat-square)](https://www.npmjs.com/package/@existence001100/dsh-skills-manager)
+[![CI](https://github.com/Existence001100/dsh-skills-manager/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/Existence001100/dsh-skills-manager/actions/workflows/ci.yml)
 [![许可证](https://img.shields.io/badge/license-MIT-16a34a.svg?style=flat-square)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-ESM-339933.svg?logo=nodedotjs&amp;logoColor=white&amp;style=flat-square)](https://nodejs.org/)
-[![最近提交](https://img.shields.io/github/last-commit/Wisdoverse/dsh-skills-manager-plugin?style=flat-square)](https://github.com/Wisdoverse/dsh-skills-manager-plugin/commits/main)
-[![GitHub Stars](https://img.shields.io/github/stars/Wisdoverse/dsh-skills-manager-plugin?style=flat-square)](https://github.com/Wisdoverse/dsh-skills-manager-plugin/stargazers)
+[![最近提交](https://img.shields.io/github/last-commit/Existence001100/dsh-skills-manager?style=flat-square)](https://github.com/Existence001100/dsh-skills-manager/commits/main)
+[![GitHub Stars](https://img.shields.io/github/stars/Existence001100/dsh-skills-manager?style=flat-square)](https://github.com/Existence001100/dsh-skills-manager/stargazers)
 
 </div>
 
 **🚀 快速安装**
 
 ```sh
-dsh plugin --profile web add @wisdoverse/dsh-skills-manager
+dsh plugin --profile web add @existence001100/dsh-skills-manager
 ```
 
 安装后请重启 Web profile。安装前请查看[环境要求与安装选项](#快速开始)。
 
 > **1.1.0 变更：** 模型发起的 `skill_manager install` 或 `skill_manager update` 现在需要一次审批决定。要恢复 1.0.x 行为，请运行 `skill_manager set-config config={"installGate":"off"}`。详见[安装确认门控](#安装确认门控)。
 
-[🚀 安装](#快速开始) · [✨ 功能](#核心特性) · [⚙️ 配置](#skill-配置) · [🐛 反馈](https://github.com/Wisdoverse/dsh-skills-manager-plugin/issues)
+[🚀 安装](#快速开始) · [✨ 功能](#核心特性) · [⚙️ 配置](#skill-配置) · [🐛 反馈](https://github.com/Existence001100/dsh-skills-manager/issues)
 
 ## 目录
 
@@ -70,6 +70,8 @@ DSH 内置的 `skill` 工具依赖模型先注意到一段简短摘要，再自�
 | 🔄 | GitHub 生命周期 | 安装、更新、权威同步、卸载和 commit 变更报告 |
 | 🧭 | Workspace 作用域 | 项目 Skill 可覆盖用户 Skill，同时避免配置跨 workspace 泄漏 |
 | 🛠️ | 内置管理 | Settings 管理界面与 `skill_manager` 模型工具 |
+| 🛂 | 安装确认门控 | 模型发起的 `install` / `update` 先请求一次审批；无审批通道时 fail-closed |
+| 🧩 | 能力缺口提案 | 可选候选目录提出缺失技能建议；每轮最多一条，绝不自动安装 |
 | 🛡️ | 安全护栏 | 来源白名单、Git 参数数组、Hook 路径校验，Hook 不经过 shell |
 
 ## 工作原理
@@ -79,9 +81,13 @@ flowchart LR
     U[用户消息] --> M[步骤前匹配器]
     M -->|auto| A[注入完整 Skill]
     M -->|suggest| S[注入轻量提醒]
+    M -->|缺口| P2[候选目录]
+    P2 -->|可选开启| PR[注入提案]
     T[工具调用] --> P[PreToolUse 策略]
     R[工具结果] --> O[PostToolUse 激活]
-    G[GitHub 来源] --> Y[安装或更新]
+    I[模型调用 install/update] --> G{安装门控}
+    G -->|allowed-once| Y[Git 克隆或拉取]
+    G -->|拒绝 / 通道缺失| D[拒绝并附降级说明]
     Y --> C[DSH Skill 目录]
     C --> M
 ```
@@ -94,6 +100,11 @@ flowchart LR
 
 默认每轮最多自动加载 2 个 Skill、建议 3 个。激活标记会写入会话历史；只要标记仍在可见上下文中，就不会重复注入完整内容。上下文压缩移除标记后，Skill 可以再次自动加载。
 
+两条独立约束保证模型不会自作主张：
+
+- **安装确认门控。** 模型发起的 `skill_manager install` 与 `skill_manager update` 在执行任何 Git 命令之前，都会先向宿主审批接缝请求一次决定。只有 `allowed-once` 才继续；拒绝、取消、通道缺失或请求抛错一律 deny。模型会收到降级说明和结构化 code（见[安装确认门控](#安装确认门控)）。
+- **能力缺口提案。** 当可选的候选目录列出了尚未安装的来源时，匹配器可以在该轮首个 step 注入一条提案。提案属于模型上下文，不是 UI 卡片，也绝不会自动安装——模型仍需调用 `install`，而该调用会被上面的门控拦截。该分支默认关闭；目录缺失、分数不足、或声明的技能都已安装时保持静默（见[候选目录](#候选目录)）。
+
 ## 快速开始
 
 ### 环境要求
@@ -105,15 +116,15 @@ flowchart LR
 ### 从 npm 安装（推荐）
 
 ```sh
-dsh plugin --profile web add @wisdoverse/dsh-skills-manager
+dsh plugin --profile web add @existence001100/dsh-skills-manager
 ```
 
-DSH 会识别包内的 `dsh.bundle` manifest，并自动把 `@wisdoverse/dsh-skills-manager` 加入 Web Profile。安装完成后，请重启正在运行的 Web Profile。
+DSH 会识别包内的 `dsh.bundle` manifest，并自动把 `@existence001100/dsh-skills-manager` 加入 Web Profile。安装完成后，请重启正在运行的 Web Profile。
 
 ### 从 GitHub 安装
 
 ```sh
-dsh plugin --profile web add github:Wisdoverse/dsh-skills-manager-plugin
+dsh plugin --profile web add github:Existence001100/dsh-skills-manager
 ```
 
 需要测试 `main` 中尚未发布的变更时，可以使用 GitHub 来源；如需可复现安装，请固定到具体 commit。
@@ -121,8 +132,8 @@ dsh plugin --profile web add github:Wisdoverse/dsh-skills-manager-plugin
 ### 更新或卸载
 
 ```sh
-dsh plugin --profile web update @wisdoverse/dsh-skills-manager
-dsh plugin --profile web remove @wisdoverse/dsh-skills-manager
+dsh plugin --profile web update @existence001100/dsh-skills-manager
+dsh plugin --profile web remove @existence001100/dsh-skills-manager
 ```
 
 执行任一操作后请重启 Profile，确保运行时 composition 与已安装 Bundle 一致。
@@ -130,8 +141,8 @@ dsh plugin --profile web remove @wisdoverse/dsh-skills-manager
 ### 安装本地 Checkout 进行开发
 
 ```sh
-git clone https://github.com/Wisdoverse/dsh-skills-manager-plugin.git
-cd dsh-skills-manager-plugin
+git clone https://github.com/Existence001100/dsh-skills-manager.git
+cd dsh-skills-manager
 pnpm install --frozen-lockfile
 dsh plugin --profile web add .
 ```
@@ -346,7 +357,7 @@ Filesystem Provider 按以下优先级解析 Skill 根目录：
 
 ### Settings 界面
 
-![DSH Web Profile 中的 Skill Management 设置界面](https://raw.githubusercontent.com/Wisdoverse/dsh-skills-manager-plugin/main/assets/skill-manager-settings.jpg)
+![DSH Web Profile 中的 Skill Management 设置界面](https://raw.githubusercontent.com/Existence001100/dsh-skills-manager/main/assets/skill-manager-settings.jpg)
 
 *页面展示激活控制、来源信息和 Skill 管理操作。*
 
@@ -421,7 +432,7 @@ pnpm lint
 | `test.mjs` | Node 测试套件 |
 | `cordis.patch.yml` | 宿主 composition 补丁 |
 
-欢迎在 [GitHub 仓库](https://github.com/Wisdoverse/dsh-skills-manager-plugin)提交 Issue 或 Pull Request。
+欢迎在 [GitHub 仓库](https://github.com/Existence001100/dsh-skills-manager)提交 Issue 或 Pull Request。
 开发环境、验证命令与 Pull Request 要求见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
 ## License

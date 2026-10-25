@@ -6,7 +6,7 @@ Security fixes are applied to the latest `1.0.x` release and the current `main` 
 
 ## Reporting a vulnerability
 
-Please use [GitHub's private vulnerability reporting](https://github.com/Wisdoverse/dsh-skills-manager-plugin/security/advisories/new) when it is available. Include:
+Please use [GitHub's private vulnerability reporting](https://github.com/Existence001100/dsh-skills-manager/security/advisories/new) when it is available. Include:
 
 - the affected version or commit;
 - the trust boundary involved;

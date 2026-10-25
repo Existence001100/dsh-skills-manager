@@ -303,7 +303,7 @@ test("render helpers name the matched skills", () => {
 });
 
 test("git sources accept Codex URLs and Claude/Codex owner/repo shorthand", () => {
-  assert.equal(normalizeGitSourceUrl("Wisdoverse/ci-status-snapshot"), "https://github.com/Wisdoverse/ci-status-snapshot.git");
+  assert.equal(normalizeGitSourceUrl("existence001100/ci-status-snapshot"), "https://github.com/existence001100/ci-status-snapshot.git");
   assert.equal(normalizeGitSourceUrl("DietrichGebert/ponytail.git"), "https://github.com/DietrichGebert/ponytail.git");
   assert.equal(isGitSourceUrl("https://github.com/a/b.git"), true);
   assert.equal(isGitSourceUrl("git@github.com:a/b.git"), true);

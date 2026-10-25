@@ -1,5 +1,5 @@
 {
-  "name": "@wisdoverse/dsh-skills-manager",
+  "name": "@existence001100/dsh-skills-manager",
   "version": "1.1.0",
   "description": "Skill manager for DeepSeek Harness: proactive skill activation with trigger hooks, GitHub source sync, and a Settings management UI.",
   "keywords": [
@@ -15,11 +15,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Wisdoverse/dsh-skills-manager-plugin.git"
+    "url": "git+https://github.com/Existence001100/dsh-skills-manager.git"
   },
-  "homepage": "https://github.com/Wisdoverse/dsh-skills-manager-plugin#readme",
+  "homepage": "https://github.com/Existence001100/dsh-skills-manager#readme",
   "bugs": {
-    "url": "https://github.com/Wisdoverse/dsh-skills-manager-plugin/issues"
+    "url": "https://github.com/Existence001100/dsh-skills-manager/issues"
   },
   "engines": {
     "node": "^22.19.0 || >=24.0.0"

@@ -1,0 +1,100 @@
+# Changelog
+
+All notable changes to this project are documented in this file.
+
+The project follows [Semantic Versioning](https://semver.org/).
+
+## 1.1.0 - 2026-10-25
+
+**BREAKING:** a model-initiated `skill_manager install` and `skill_manager update` now need one approval decision before any Git command runs. `installGate` defaults to `ask`. Set it to `off` to restore the 1.0.x behavior.
+
+### Added
+
+- `installGate` (`ask` | `deny` | `off`) in `set-config` and in the `skill_manager` tool schema.
+- An opt-in candidate catalog and a capability-gap proposal (`proposeEnabled`, `proposeThreshold`, `maxPropose`, `candidateCatalogPath`). The branch stays silent until it is turned on.
+- A structured rejection result for the model. It carries a degradation note and `info: { name: "SkillInstallBlocked", code }`.
+- Gate tests for the one-shot approval, rejection, cancellation, missing channel, thrown request, policy deny, `off`, `update`, invalid source, and upstream precedence.
+
+### Security
+
+- Model-initiated install and update fail closed. A missing approval channel blocks the call instead of installing.
+
+## 1.0.6 - 2026-10-02
+
+### Fixed
+
+- Emit producer-owned plugin message sources accepted by DSH session format v4, while recognizing earlier activation markers.
+
+## 1.0.5 - 2026-09-30
+
+### Changed
+
+- Accept the tested DSH `0.2.0-rc.2` runtime while retaining the existing `0.1.x` host range.
+
+## 1.0.4 - 2026-09-10
+
+### Fixed
+
+- Serve Settings through DSH's authenticated `/api` Fetch registry, avoiding the broken third-party RPC channel registration in current DSH releases.
+- Emit canonical DSH plugin notices while continuing to recognize legacy `skill-manager` message sources.
+
+## 1.0.3 - 2026-09-07
+
+### Changed
+
+- Promote the DSH 0.1.3 compatibility changes from `1.0.3-alpha.1` to the stable release; runtime behavior is unchanged.
+
+## 1.0.3-alpha.1 - 2026-09-05
+
+### Changed
+
+- Accept the DeepSeek Harness `0.1.3-alpha.1` prerelease in host peer dependencies.
+
+### Fixed
+
+- Depend on the client slots provider instead of the removed `dsh-client-runtime` package.
+- Read session history through `snapshotEvents()` on DSH `0.1.3-alpha.1`, retaining the legacy `events` fallback.
+- Recognize array-based visible surface nodes so resumed skills stay active and compacted activations can be injected again.
+
+## 1.0.2 - 2026-09-01
+
+### Changed
+
+- Accept the DeepSeek Harness `0.1.2-alpha.3` host runtime while retaining `0.1.1-rc.2` compatibility.
+
+### Fixed
+
+- Keep the initial state event history as an array when a fresh DSH Home has no state file yet.
+
+## 1.0.1 - 2026-08-29
+
+### Added
+
+- Token-free npm Trusted Publishing from version-matched GitHub tags, with release gates and automatic provenance.
+- English and Simplified Chinese localization for all static Settings UI copy, following the active DSH display language.
+- A repository-owned marketplace screenshot captured from a real DSH Web profile.
+
+### Changed
+
+- Consume official DSH runtime packages as host-provided peer dependencies instead of bundling duplicate copies.
+
+### Fixed
+
+- Register the browser bundle under the scoped package name expected by the DSH client loader.
+
+## 1.0.0 - 2026-08-29
+
+### Added
+
+- Proactive `auto` and `suggest` skill activation.
+- Skill-level lifecycle hooks and tool-call policies.
+- GitHub-backed skill installation, update, and uninstall workflows.
+- Project-scoped skill overrides and Settings management UI.
+- Cross-platform CI for Node.js 22 and 24 on Ubuntu and Windows.
+- Package-contract tests for the DSH bundle manifest, patch, exports, and packaged files.
+- Verified npm and GitHub installation, update, removal, compatibility, permission, security, and contribution documentation.
+- Machine-readable repository, runtime, package-manager, and public npm publishing metadata.
+
+### Fixed
+
+- Normalize discovered skill paths to `/` on every platform so Windows installations persist portable repository-relative paths.

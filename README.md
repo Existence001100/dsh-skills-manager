@@ -25,7 +25,7 @@ dsh plugin --profile web add @existence001100/dsh-skills-manager
 
 Restart the Web profile after installation. See [requirements and installation options](#quick-start).
 
-> **Changed in 1.1.0:** a model-initiated `skill_manager install` or `skill_manager update` now needs one approval decision. To restore the 1.0.x behavior, run `skill_manager set-config config={"installGate":"off"}`. See [install consent gate](#install-consent-gate).
+> **Changed in 1.1.1:** a model-initiated `skill_manager install` or `skill_manager update` now needs one approval decision. To restore the 1.0.x behavior, run `skill_manager set-config config={"installGate":"off"}`. See [install consent gate](#install-consent-gate).
 
 [🚀 Installation](#quick-start) · [✨ Features](#highlights) · [⚙️ Configuration](#skill-configuration) · [🐛 Feedback](https://github.com/Existence001100/dsh-skills-manager/issues)
 

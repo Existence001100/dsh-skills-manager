@@ -25,7 +25,7 @@ dsh plugin --profile web add @existence001100/dsh-skills-manager
 
 安装后请重启 Web profile。安装前请查看[环境要求与安装选项](#快速开始)。
 
-> **1.1.0 变更：** 模型发起的 `skill_manager install` 或 `skill_manager update` 现在需要一次审批决定。要恢复 1.0.x 行为，请运行 `skill_manager set-config config={"installGate":"off"}`。详见[安装确认门控](#安装确认门控)。
+> **1.1.1 变更：** 模型发起的 `skill_manager install` 或 `skill_manager update` 现在需要一次审批决定。要恢复 1.0.x 行为，请运行 `skill_manager set-config config={"installGate":"off"}`。详见[安装确认门控](#安装确认门控)。
 
 [🚀 安装](#快速开始) · [✨ 功能](#核心特性) · [⚙️ 配置](#skill-配置) · [🐛 反馈](https://github.com/Existence001100/dsh-skills-manager/issues)
 

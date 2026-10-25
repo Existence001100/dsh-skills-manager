@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
-## 1.1.0 - 2026-10-25
+## 1.1.1 - 2026-10-25
 
 **BREAKING:** a model-initiated `skill_manager install` and `skill_manager update` now need one approval decision before any Git command runs. `installGate` defaults to `ask`. Set it to `off` to restore the 1.0.x behavior.
 
